@@ -6,8 +6,19 @@ import { base, baseSepolia, mainnet } from "viem/chains";
 import { createSiweMessage, parseSiweMessage } from "viem/siwe";
 
 const app = new Hono();
+app.options("*", (c) => {
+  c.header("Access-Control-Allow-Origin", "*");
+  c.header("Access-Control-Allow-Methods", "OPTIONS,POST,GET,PUT,DELETE");
+  c.header("Access-Control-Allow-Headers", "*");
+  return c.text("");
+});
 
-app.get("/", (c) => c.text("ping"));
+app.get("/", (c) => {
+  c.header("Access-Control-Allow-Origin", "*");
+  c.header("Access-Control-Allow-Methods", "OPTIONS,POST,GET,PUT,DELETE");
+  c.header("Access-Control-Allow-Headers", "*");
+  return c.text("ping");
+});
 app.post("/verify", async (c) => {
   try {
     const {
@@ -48,16 +59,23 @@ app.post("/verify", async (c) => {
       message: siweMessage,
       signature,
     });
+    c.header("Access-Control-Allow-Origin", "*");
+    c.header("Access-Control-Allow-Methods", "OPTIONS,POST,GET,PUT,DELETE");
+    c.header("Access-Control-Allow-Headers", "*");
 
     return c.json({ success: isValid });
   } catch (error) {
     console.error(error);
+    c.header("Access-Control-Allow-Origin", "*");
+    c.header("Access-Control-Allow-Methods", "OPTIONS,POST,GET,PUT,DELETE");
+    c.header("Access-Control-Allow-Headers", "*");
+
     return c.json({ success: false, error: (error as Error).message });
   }
 });
 
-// serve(app, (info) => {
-//   console.log(`Listening on http://localhost:${info.port}`);
-// });
+serve(app, (info) => {
+  console.log(`Listening on http://localhost:${info.port}`);
+});
 
 export const handler = handle(app);
